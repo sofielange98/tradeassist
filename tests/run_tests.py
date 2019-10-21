@@ -2,7 +2,7 @@ import unittest
 import sys
 import os
 from flask import Flask
-from app.db import DbConnection
+from tradeassist.app.db import DbConnection
 # TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TradeAssistTest(unittest.TestCase):
