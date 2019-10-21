@@ -1,0 +1,12 @@
+language: python
+
+python:
+  - "2.7"
+
+sudo: false
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - python tests/run_tests.py

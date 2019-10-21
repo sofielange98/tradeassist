@@ -1,0 +1,7 @@
+Flask
+functools
+sqlite3
+Werkzeug
+click
+os
+sys
