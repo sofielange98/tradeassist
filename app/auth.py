@@ -6,71 +6,26 @@ from flask import (
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from app.db import DbConnection
+from app.User import User 
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
-    db = DbConnection.getInstance().db 
+    db = DbConnection.getInstance()
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        indicators = request.form.getlist('indicator')
-        frequencies = []
-        symbols = []
-        for indicator in indicators:
-            frequencies.append(request.form[indicator+'_frequency'])
-            symbols.append(request.form[indicator + '_symbol'])
-        print(request.form)
-        print(indicators)
+        user = User(request.form)
         
-        error = None
+        if db.check_existing_user(user) != None:
+            error = 'Email {} is already registered.'.format(user.email)
 
-        if not username:
-            error = 'Username is required.'
-        elif not password:
-            error = 'Password is required.'
-        elif not email:
-            error = "Email is required."
-        elif db.execute(
-            'SELECT id FROM USER WHERE email = ?', (email,)
-        ).fetchone() is not None:
-            error = 'Email {} is already registered.'.format(email)
-
-        if error is None:
-            db.execute(
-                'INSERT INTO USER (email, username, password) VALUES (?, ?, ?)',
-                (email, username, generate_password_hash(password))
-            )
-            db.commit()
-            user_id = db.execute(
-            'SELECT id FROM user WHERE email = ?', (email,)
-            ).fetchone()
-            print(user_id)
-            for i in range(len(indicators)):
-                print([indicators[i]])
-                strat_id = db.execute(
-                'SELECT id FROM STRATEGIES where name =?',([indicators[i]])
-                ).fetchone()
-                print(strat_id)
-                symbol_id = db.execute(
-                'SELECT id FROM symbols where symbol = ?',([symbols[i]])
-                ).fetchone()
-                db.execute(
-                    'INSERT INTO USER_STRATEGIES (user_id, strat_id,symbol_id,interim) VALUES (?,?,?,?)',
-                    (user_id[0], strat_id[0],symbol_id[0],frequencies[i])
-                )
-                db.commit()
+        if user.error is None:
+            db.insert_new_user(user)
             return redirect(url_for('auth.login'))
 
         flash(error)
-    available_symbols = db.execute(
-        'SELECT symbol from SYMBOLS'
-        ).fetchall()
-    available_strategies = db.execute(
-        'SELECT name from STRATEGIES'
-        ).fetchall()
+    available_symbols = db.get_symbols()
+    available_strategies = db.get_strategies()
     print([s[0] for s in available_symbols])
     available_symbols = [s[0] for s in available_symbols]
     available_strategies = [s[0] for s in available_strategies]
@@ -81,29 +36,21 @@ def login():
     if request.method == 'POST':
         email = request.form['email']
         password = request.form['password']
-        db = DbConnection.getInstance().db
+        db = DbConnection.getInstance()
         error = None
-        user = db.execute(
-            'SELECT * FROM user WHERE email = ?', (email,)
-        ).fetchone()
-        
+        user = db.get_user_by_email(email)
+        user['password'] = password
+        user = User(user)
         if user is None:
             error = 'Incorrect email.'
-        elif not check_password_hash(user['password'], password):
+        elif not user.valid_user_password(password):
             error = 'Incorrect password.'
-
+        print(error)
         if error is None:
+            print("Successful login!!")
             session.clear()
-            session['user_id'] = user['id']
-            user_info = db.execute(
-            ("SELECT "
-                "STRATEGIES.name, SYMBOL.symbol, USER_STRATEGIES.interim "
-                "from "
-                "USER_STRATEGIES "
-                "INNER JOIN STRATEGIES on STRATEGIES.id = USER_STRATEGIES.strat_id "
-                "INNER JOIN SYMBOLS as SYMBOL on SYMBOL.id = USER_STRATEGIES.symbol_id "
-                "WHERE USER_STRATEGIES.user_id = ?"), (user['id'],)
-            ).fetchall()
+            session['user_id'] = user.id
+            user_info = db.get_user_strategies(user)
                        
             return render_template('account.html', strategies = user_info)
 

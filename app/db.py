@@ -24,10 +24,74 @@ class DbConnection:
                     check_same_thread=False
                 )
                 self.db.row_factory = sqlite3.Row
+
     def __del__(self):
         print("Closing database connection")
         self.db.close()
 
+    def insert_new_user(self, user):
+        self.db.execute(
+                'INSERT INTO USER (email, username, password) VALUES (?, ?, ?)',
+                (user.email, user.username, user.password)
+            )
+        self.db.commit()
+        user_id = self.db.execute(
+            'SELECT id FROM user WHERE email = ?', (user.email,)
+            ).fetchone()
+        print(user_id)
+        for i in range(len(user.indicators)):
+            print([user.indicators[i]])
+            strat_id = self.db.execute(
+                'SELECT id FROM STRATEGIES where name =?',([user.indicators[i]])
+                ).fetchone()
+            print(strat_id)
+            symbol_id = self.db.execute(
+                'SELECT id FROM symbols where symbol = ?',([user.symbols[i]])
+                ).fetchone()
+            self.db.execute(
+                    'INSERT INTO USER_STRATEGIES (user_id, strat_id,symbol_id,interim) VALUES (?,?,?,?)',
+                    (user_id[0], strat_id[0],symbol_id[0],user.frequencies[i])
+                )
+        self.db.commit()
+
+    def check_existing_user(self, user):
+        if self.db.execute(
+            'SELECT id FROM USER WHERE email = ?', (user.email,)
+        ).fetchone() is not None:
+            return True
+        else:  
+            return None
+    def get_user_by_email(self, email):
+        user = self.db.execute(
+            'SELECT * FROM user WHERE email = ?', (email,)
+        ).fetchone()
+        print(user)
+        if user != None:
+            user = {
+                'username': user['username'],
+                'email': user['email'],
+                'id':user['id']
+                }
+        return(user)
+    def get_user_strategies(self,user):
+        info = self.db.execute(
+            ("SELECT "
+                "STRATEGIES.name, SYMBOL.symbol, USER_STRATEGIES.interim "
+                "from "
+                "USER_STRATEGIES "
+                "INNER JOIN STRATEGIES on STRATEGIES.id = USER_STRATEGIES.strat_id "
+                "INNER JOIN SYMBOLS as SYMBOL on SYMBOL.id = USER_STRATEGIES.symbol_id "
+                "WHERE USER_STRATEGIES.user_id = ?"), (user.id,)
+            ).fetchall()
+        return info
+    def get_symbols(self):
+        return(self.db.execute(
+        'SELECT symbol from SYMBOLS'
+        ).fetchall())
+    def get_strategies(self):
+        return(self.db.execute(
+        'SELECT name from STRATEGIES'
+        ).fetchall())
 def get_db():
     if 'db' not in g:
         print("Connecting to database")
