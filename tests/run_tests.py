@@ -2,18 +2,18 @@ import unittest
 import sys
 import os
 from flask import Flask
-from tradeassist.app.db import DbConnection
+from app.db import DbConnection
 # TEST_DIR = os.path.dirname(os.path.abspath(__file__))
 
 class TradeAssistTest(unittest.TestCase):
-    def setUp(self):
-        app = Flask(__name__)
-        app.config.from_mapping(
-          SECRET_KEY='test_key',
-          DATABASE=os.path.join(app.instance_path, 'tradeassist.sqlite'),
-          )
-        
-        self.db = DbConnection().getInstance()
+    def test_test(self):
+    	self.assertTrue(True)
+
+    def test_singleton(self):
+    	self.db = DbConnection()
+    	x = self.db.getInstance()
+    	y = self.db.getInstance()
+    	self.assertTrue( x is y )
 
 
 if __name__ == '__main__':

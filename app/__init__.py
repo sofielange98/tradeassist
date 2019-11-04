@@ -1,13 +1,13 @@
 import os
 
 from flask import Flask
-from flask_bootstrap import Bootstrap
 
 app = Flask(__name__)
 
 app.config.from_mapping(
     SECRET_KEY='dev',
     DATABASE=os.path.join(app.instance_path, 'tradeassist.sqlite'),
+    API_KEY = 'EKO46GFZF2SFKBM7'
 )
 
 try:
@@ -15,13 +15,10 @@ try:
 except OSError:
     pass
 
-from db import DbConnection
+from app.db import DbConnection
 DbConnection()
 
 from app import routes
-
-from . import db
-db.init_app(app)
 
 from . import auth
 app.register_blueprint(auth.bp)

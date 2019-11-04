@@ -92,9 +92,10 @@ class DbConnection:
         return(self.db.execute(
         'SELECT name from STRATEGIES'
         ).fetchall())
+
+
 def get_db():
     if 'db' not in g:
-        print("Connecting to database")
         g.db = sqlite3.connect(
             current_app.config['DATABASE'],
             detect_types=sqlite3.PARSE_DECLTYPES
