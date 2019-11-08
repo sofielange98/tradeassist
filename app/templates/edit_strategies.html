@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Register</h1>
+{% for strategy in available_strategies %}
+		  	<div class = "form-group">
+			  	<div class = "form-group row">
+					<div class="form-check">
+						<input class="form-check-input" type="checkbox" id="{{strategy}}" value="{{strategy}}" name = "indicator">
+						<label class="form-check-label" for="{{strategy}}">{{strategy}}</label>
+					</div>
+				</div>
+		    	<div class = "form-group row">
+					<div class = "col">
+						<div class="col-auto my-1">
+					      <label class="mr-sm-2" for="inlineFormCustomSelect">Symbol</label>
+					      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "{{strategy}}_symbol">
+					        <option selected>Choose...</option>
+					        {% for symbol in available_symbols %}
+					        <option value="{{symbol}}">{{symbol}}</option>
+					        {% endfor %}
+					      </select>
+					    </div>
+					</div>
+					<div class = "col">
+						<div class="form-check">
+						  <input class="form-check-input" type="radio" name="{{strategy}}_frequency" id="daily" value="daily">
+						  <label class="form-check-label" for="daily">daily</label>
+						</div>
+						<div class="form-check">
+						  <input class="form-check-input" type="radio" name="{{strategy}}_frequency" id="weekly" value="weekly">
+						  <label class="form-check-label" for="weekly">weekly</label>
+						</div>
+						<div class="form-check">
+						  <input class="form-check-input" type="radio" name="{{strategy}}_frequency" id="monthly" value="monthly">
+						  <label class="form-check-label" for="weekly">monthly</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		  {% endfor %}
+{% endblock %}

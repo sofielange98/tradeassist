@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block header %}
+  <h1>{% block title %}All Symbols{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+	<br>
+  {% for symbol in available_symbols %}
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div class="tradingview-widget-container__widget"></div>
+  <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/symbols/{{symbol}}/" rel="noopener" target="_blank"><span class="blue-text">{{symbol}} Profile</span></a> by TradingView</div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-profile.js" async>
+  {
+  "symbol": {{symbol}},
+  "width": 480,
+  "height": 650,
+  "colorTheme": "dark",
+  "isTransparent": false,
+  "locale": "en"
+}
+  </script>
+</div>
+<!-- TradingView Widget END -->
+  {% endfor %}
+{% endblock %}

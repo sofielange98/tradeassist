@@ -5,31 +5,75 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
   </head>
+<style>
+  body{
+    background-color: #343a40;
+    color: white;
+  }
+</style>
 {% block navbar %}
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+  <div class="container-fluid">
   <ul class="navbar-nav">
-    <li class="nav-item active">
-      <a class="nav-brand" href="#"><img src = '../static/img/logo.png' style = "width: 50px"></a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Home</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="#">Available Strategies</a>
-    </li>
+    <li class = "nav-item"><a class="nav-brand" href="#"><img src = '../static/img/logo.png' style = "width: 60px;height: 40px"></a></li>
+    <li class="nav-item active"><a class = "nav-link" href="/">Home</a></li>
+    <li class="nav-item"> <a a class = "nav-link" href="/info/AllStrategies">Available Strategies</a> </li>
+    <li class="nav-item"> <a a class = "nav-link" href="/info/AllSymbols">Available Symbols</a> </li>
   </ul>
   <ul class="navbar-nav navbar-right">
-      <li class="nav-item">
-      <a class="nav-link" href="/auth/register">Signup</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="/auth/login">Login</a>
-    </li>
-    </ul>
+      <li class="nav-item"> <a  class = "nav-link" href="/auth/register"> <span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
+      <li class="nav-item"><a  class = "nav-link" href="/auth/login"> <span class="glyphicon glyphicon-log-in"></span> Login</a></li>
+  </ul>
+</div>
 </nav>
-{% endblock %}
-{% block content %}
-    <div class="container">
+<!-- TradingView Widget BEGIN -->
+<div class="tradingview-widget-container">
+  <div class="tradingview-widget-container__widget"></div>
+  <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
+  {
+  "symbols": [
+    {
+      "proName": "OANDA:SPX500USD",
+      "title": "S&P 500"
+    },
+    {
+      "proName": "OANDA:NAS100USD",
+      "title": "Nasdaq 100"
+    },
+    {
+      "proName": "FX_IDC:EURUSD",
+      "title": "EUR/USD"
+    },
+    {
+      "description": "BTC/USD",
+      "proName": "COINBASE:BTCUSD"
+    },
+    {
+      "description": "Google",
+      "proName": "NASDAQ:GOOG"
+    },
+    {
+      "description": "Apple",
+      "proName": "NASDAQ:AAPL"
+    },
+    {
+      "description": "SPY",
+      "proName": "AMEX:SPY"
+    },
+    {
+      "description": "Dow Jones",
+      "proName": "DJCFD:DJI"
+    }
+  ],
+  "colorTheme": "dark",
+  "isTransparent": false,
+  "displayMode": "adaptive",
+  "locale": "en"
+}
+  </script>
+</div>
+<!-- TradingView Widget END -->
+    <div class="container" id = "messages">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
@@ -41,4 +85,6 @@
         {# application content needs to be provided in the app_content block #}
         {% block app_content %}{% endblock %}
     </div>
+{% endblock %}
+{% block content %}
 {% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>My Strategies</h1>
+<div class = "container">
+	<div class = "row">
+	  	<div class = "col-md-3">
+	  		Technical Indicator
+	  	</div>
+	  	<div class = "col-md-3">
+	  		Symbol
+	  	</div>
+	  	<div class = "col-md-3">
+	  		Frequency
+	  	</div>
+  </div>
+  {% for user_strat in strategies %}
+  <div class = "row">
+  	{% for val in user_strat %}
+  	<div class = "col-md-3">
+  		{{val}}
+  	</div>
+  	{%endfor%}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
