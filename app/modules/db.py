@@ -39,7 +39,7 @@ class DbConnection:
         user_id = self.db.execute(
             'SELECT id FROM user WHERE email = ?', (user.email,)
             ).fetchone()
-        print(user_id)
+        print(user_id[0])
         for i in range(len(user.indicators)):
             print([user.indicators[i]])
             strat_id = self.db.execute(
@@ -54,6 +54,7 @@ class DbConnection:
                     (user_id[0], strat_id[0],symbol_id[0],user.frequencies[i])
                 )
         self.db.commit()
+        return user_id[0]
 
     def check_existing_user(self, user):
         if self.db.execute(
@@ -113,6 +114,17 @@ class DbConnection:
         return(self.db.execute(
         'SELECT name from STRATEGIES'
         ).fetchall())
+    def get_all_user_strategies(self):
+        info = self.db.execute(
+            ("SELECT " 
+            "USER_STRATEGIES.id, STRATEGIES.name, SYMBOLS.symbol, USER.email, USER_STRATEGIES.last_check, USER_STRATEGIES.interim "
+            "from "
+            "USER_STRATEGIES "
+            "INNER JOIN STRATEGIES on STRATEGIES.id = USER_STRATEGIES.strat_id "
+            "INNER JOIN SYMBOLS on SYMBOLS.id = USER_STRATEGIES.symbol_id "
+            "INNER JOIN USER on USER.id = USER_STRATEGIES.user_id;")
+            ).fetchall()
+        return info
 
 
 def get_db():

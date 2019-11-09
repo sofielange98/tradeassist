@@ -21,12 +21,18 @@ class Strategy:
 #
 # check status will return results of calling api for given strategy and return buy/sell/none
 #
-	def check_status(self, params):
+	def check_status(self, symbol):
 		triggered = False
 # https://www.alphavantage.co/query?function=MACD&symbol=MSFT&interval=daily&series_type=open&apikey=demo
-		API = API_Interface.getInstance()
-		params['apikey'] = API.key
-		print(app.config['ALPHA_API_KEY'])
+		params = {
+			'apikey' : app.config['ALPHA_API_KEY'],
+			'symbol' : symbol,
+			'function' : self.api_func,
+			'interval' : 'daily',
+			'series_type' : 'open'
+		}
+		if self.api_func == 'BBANDS':
+			params['time_period'] = 60
 		resp = requests.get(url = self.api_url, params = params)
 		s = json.dumps(resp.json())
 		y = json.loads(s)
@@ -68,10 +74,9 @@ class Strategy:
 		params = {
 			'series_type':series_type,
 			'symbol':symbol,
-			'function':'TIME_SERIES_DAILY'
+			'function':'TIME_SERIES_DAILY',
+			'apikey':app.config['ALPHA_API_KEY']
 		}
-		API = API_Interface.getInstance()
-		params['apikey'] = API.key
 
 		resp = requests.get(url = self.api_url, params = params)
 		s = json.dumps(resp.json())
@@ -99,9 +104,15 @@ class Strategy:
 		self.name = name
 		name_to_func = {
 			"MACD":self.macd_check,
-			"STOCH":self.stochastic_check,
-			"BBANDS":self.bollinger_check
+			"STOCHASTIC":self.stochastic_check,
+			"BOLLINGER":self.bollinger_check
 			}
+		name_to_api_func = {
+			"MACD":'MACD',
+			"STOCHASTIC":"STOCH",
+			"BOLLINGER":"BBANDS"
+			}
+		self.api_func = name_to_api_func[name]
 		self.signal_check = name_to_func[name]
 
 

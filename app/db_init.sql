@@ -32,9 +32,9 @@ CREATE TABLE SYMBOLS (
   other_name TEXT
 );
 
-INSERT INTO SYMBOLS (symbol, other_name) VALUES ('SPY', 'spyder');
-INSERT INTO SYMBOLS (symbol, other_name) VALUES ('SNP', 'S&P 500');
-INSERT INTO SYMBOLS (symbol, other_name) VALUES ('DJI', 'Dow Jones Industrial Average');
+INSERT INTO SYMBOLS (symbol, other_name, full_symbol) VALUES ('SPY', 'S&P 500 Index', 'AMEX:SPY');
+INSERT INTO SYMBOLS (symbol, other_name, full_symbol) VALUES ('SPX', 'S&P 500', 'TVC:SPX');
+INSERT INTO SYMBOLS (symbol, other_name, full_symbol) VALUES ('DJI', 'Dow Jones Industrial Average', 'TVC:DJI');
 
 INSERT INTO STRATEGIES (api_ref, name) VALUES ('to-do', 'STOCHASTIC');
 INSERT INTO STRATEGIES (api_ref, name) VALUES ('to-do', 'BOLLINGER');

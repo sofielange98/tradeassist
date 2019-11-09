@@ -22,9 +22,9 @@ def register():
             return render_template('auth/register.html')
 
         if user.error is None:
-            db.insert_new_user(user)
+            user_id = db.insert_new_user(user)
             session.clear()
-            session['user_id'] = user.id
+            session['user_id'] = user_id
             return render_template('edit_strategies.html')
 
     available_symbols = db.get_symbols()

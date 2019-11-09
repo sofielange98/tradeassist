@@ -3,36 +3,43 @@ import os
 from flask import Flask
 from flask_apscheduler import APScheduler
 
+
 class Config(object):
     JOBS = [
+        {
+            'id': 'check',
+            'func': 'app:check',
+            'trigger': 'interval',
+            'days': 1,
+            
+        },
         {
             'id': 'job1',
             'func': 'app:job1',
             'args': (1, 2),
             'trigger': 'interval',
-            'seconds': 10,
+            'seconds': 20,
             
         }
     ]
 
     SCHEDULER_API_ENABLED = True
-
     SECRET_KEY='dev'
-    API_KEY = 'EKO46GFZF2SFKBM7'
+    ALPHA_API_KEY = 'EKO46GFZF2SFKBM7'
 
-def job1(a, b):
-    print(str(a) + ' ' + str(b))
+def job1(a,b):
+    print(a,b)
+
+def check():
+    print("Checking")
+    checker = DailyChecker()
+    checker.execute()
 
 app = Flask(__name__)
 
 #scheduler set up
 app.config.from_object(Config())
-scheduler = APScheduler()
-    # it is also possible to enable the API directly
-    # scheduler.api_enabled = True
-scheduler.init_app(app)
 
-scheduler.start()
 #database set up
 try:
     os.makedirs(app.instance_path)
@@ -52,6 +59,18 @@ app.config['MAIL_USE_SSL'] = True
 #routing for requests
 from app.modules.db import DbConnection
 DbConnection()
+
+#### UNCOMMENT FOR A LOT OF API REQUESTS ####
+# from app.modules.DailyCheck import DailyChecker
+# checker = DailyChecker()
+# checker.execute()
+
+scheduler = APScheduler()
+    # it is also possible to enable the API directly
+    # scheduler.api_enabled = True
+scheduler.init_app(app)
+
+scheduler.start()
 
 from app.routes import routes
 

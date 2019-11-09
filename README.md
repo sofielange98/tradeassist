@@ -3,7 +3,7 @@ requires python 3
 run the following once the repo is on your machine
 cd tradeassist
 # activate the virtual environment
-source app/app_env/bin/activate
+source app/env/bin/activate
 # configure for dev
 export FLASK_ENV=development
 # create the database
