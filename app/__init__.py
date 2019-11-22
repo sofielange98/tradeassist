@@ -60,10 +60,10 @@ app.config['MAIL_USE_SSL'] = True
 from app.modules.db import DbConnection
 DbConnection()
 
-#### UNCOMMENT FOR A LOT OF API REQUESTS ####
-# from app.modules.DailyCheck import DailyChecker
-# checker = DailyChecker()
-# checker.execute()
+### UNCOMMENT FOR A LOT OF API REQUESTS ####
+from app.modules.DailyCheck import DailyChecker
+checker = DailyChecker()
+checker.execute()
 
 scheduler = APScheduler()
     # it is also possible to enable the API directly
@@ -85,6 +85,9 @@ app.register_blueprint(info.bp)
 
 from app.routes import mailer 
 app.register_blueprint(mailer.bp)
+
+from app.routes import account
+app.register_blueprint(account.bp)
 
 from flask_mail import Mail, Message
 mail = Mail(app)

@@ -1,42 +1,143 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>Register</h1>
-{% for strategy in available_strategies %}
-		  	<div class = "form-group">
-			  	<div class = "form-group row">
-					<div class="form-check">
-						<input class="form-check-input" type="checkbox" id="{{strategy}}" value="{{strategy}}" name = "indicator">
-						<label class="form-check-label" for="{{strategy}}">{{strategy}}</label>
-					</div>
-				</div>
-		    	<div class = "form-group row">
-					<div class = "col">
-						<div class="col-auto my-1">
-					      <label class="mr-sm-2" for="inlineFormCustomSelect">Symbol</label>
-					      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "{{strategy}}_symbol">
-					        <option selected>Choose...</option>
-					        {% for symbol in available_symbols %}
-					        <option value="{{symbol}}">{{symbol}}</option>
-					        {% endfor %}
-					      </select>
-					    </div>
-					</div>
-					<div class = "col">
-						<div class="form-check">
-						  <input class="form-check-input" type="radio" name="{{strategy}}_frequency" id="daily" value="daily">
-						  <label class="form-check-label" for="daily">daily</label>
-						</div>
-						<div class="form-check">
-						  <input class="form-check-input" type="radio" name="{{strategy}}_frequency" id="weekly" value="weekly">
-						  <label class="form-check-label" for="weekly">weekly</label>
-						</div>
-						<div class="form-check">
-						  <input class="form-check-input" type="radio" name="{{strategy}}_frequency" id="monthly" value="monthly">
-						  <label class="form-check-label" for="weekly">monthly</label>
-						</div>
-					</div>
-				</div>
+<div class = "container" id = "form_container">
+	<fieldset class = "border p-2" style = "background-color:#1e212d;">
+	<legend style="font-weight:bold;  width:inherit; padding:0 10px; border-bottom:none;">Add Strategy</legend>
+	<form method="post" action = "/account/AddStrategy" id = "AddForm">
+	<div class = "form-group">
+		<div class = "form-row">
+			<div class = "col">
+				<div class="col-auto my-1">
+			      <label class="mr-sm-2" for="inlineFormCustomSelect">Strategy</label>
+			      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "strategy">
+			        <option selected>Choose...</option>
+			        {% for strategy in available_strategies %}
+			        <option value="{{strategy}}">{{strategy}}</option>
+			        {% endfor %}
+			      </select>
+			    </div>
 			</div>
-		  {% endfor %}
+			<div class = "col">
+				<div class="col-auto my-1">
+			      <label class="mr-sm-2" for="inlineFormCustomSelect">Symbol</label>
+			      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "symbol">
+			        <option selected>Choose...</option>
+			        {% for symbol in available_symbols %}
+			        <option value="{{symbol}}">{{symbol}}</option>
+			        {% endfor %}
+			      </select>
+			    </div>
+			</div>
+			<div class = "col">
+				<div class="col-auto my-1">
+			      <label class="mr-sm-2" for="inlineFormCustomSelect">Frequency</label>
+			      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "frequency">
+			        <option selected>Choose...</option>
+			        {% for freq in ['daily','weekly','monthly'] %}
+			        <option value="{{freq}}">{{freq}}</option>
+			        {% endfor %}
+			      </select>
+			    </div>
+			</div>
+			<div class = "col text-center my-auto" id = "submit_new">
+				<button type="submit" class="btn btn-secondary">
+  					<i class="fa fa-plus-circle"></i>
+          				Add Strategy
+				</button>
+				
+        	</div>
+			</div>
+		</div>
+	</form>
+	</fieldset>
+</div>	
+<div class = "container" id = "delete_container">
+	<fieldset class = "border p-2" style = "background-color:#1e212d;">
+	<legend class="w-auto" style="font-weight:bold;  width:inherit; padding:0 10px; border-bottom:none;">Edit Strategies</legend>
+  	<table class="table">
+		  <thead>
+		    <tr>
+		      <th scope = "col">#</th>
+		      <th scope="col">Technical Indicator</th>
+		      <th scope="col">Symbol</th>
+		      <th scope="col">Frequency</th>
+		      <th scope="col"></th>
+		    </tr>
+		  </thead>
+		  <tbody>
+		  	{% for idx in range(0, strategies|length) %}
+			  	<tr>
+			  		<td>{{idx+1}}</td>
+			  		{% for k in ['name','symbol','interim'] %}
+					  	<td>{{strategies[idx][k]}}</td>
+					{% endfor %}
+					<td>
+						<button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal{{strategies[idx]['name']}}">
+  						<i class="fa fa-pencil"></i>
+						</button>
+					</td>
+			    </tr>
+							<!-- Modal -->
+				<div class="modal fade" id="exampleModal{{strategies[idx]['name']}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+				  <div class="modal-dialog" role="document">
+				    <div class="modal-content">
+				      <div class="modal-header">
+				        <h5 class="modal-title" id="exampleModalLabel" style = "color:#1e212d"> Edit Strategy</h5>
+				        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+				          <span aria-hidden="true">&times;</span>
+				        </button>
+				      </div>
+				      <div class="modal-body" style = "color:#1e212d">
+				      	<form method = "post" action = "/account/EditStrategies">
+				      	<div class = "col">
+							<div class="col-auto my-1">
+						      <label class="mr-sm-2" for="inlineFormCustomSelect">Strategy</label>
+						      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "strategy">
+						        <option selected>{{strategies[idx]['name']}}</option>
+						        {% for strategy in available_strategies | reject("==",strategies[idx]['name'])%}
+						        <option value="{{strategy}}">{{strategy}}</option>
+						        {% endfor %}
+						      </select>
+						    </div>
+						</div>
+						<div class = "col">
+							<div class="col-auto my-1">
+						      <label class="mr-sm-2" for="inlineFormCustomSelect">Symbol</label>
+						      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "symbol">
+						        <option selected>{{strategies[idx]['symbol']}}</option>
+						        {% for symbol in available_symbols | reject("==",strategies[idx]['symbol'])%}
+						        <option value="{{symbol}}">{{symbol}}</option>
+						        {% endfor %}
+						      </select>
+						    </div>
+						</div>
+						<div class = "col">
+							<div class="col-auto my-1">
+						      <label class="mr-sm-2" for="inlineFormCustomSelect">Frequency</label>
+						      <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name = "frequency">
+						        <option selected>{{strategies[idx]['interim']}}</option>
+						        {% for freq in ['daily','weekly','monthly'] | reject("==",strategies[idx]['interim'])%}
+						        <option value="{{freq}}">{{freq}}</option>
+						        {% endfor %}
+						      </select>
+						    </div>
+						</div>
+						<input type="hidden" id="strat_id" name="strat_id" value="{{strategies[idx]['id']}}">
+				      </div>
+				      <div class="modal-footer">
+				        <button type="submit" class="btn btn-secondary" name = "button" value = "Delete">Delete Strategy</button>
+				        <button type="sumbit" class="btn btn-primary" name = "button" value = "Update">Submit changes</button>
+				      </div>
+				      </form>
+				    </div>
+				  </div>
+				</div>
+		  	{% endfor %}
+		  </tbody>
+		</table>
+</fieldset>
+</div>
+</div>
+</div>
 {% endblock %}

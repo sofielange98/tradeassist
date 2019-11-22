@@ -29,9 +29,6 @@ def register():
 
     available_symbols = db.get_symbols()
     available_strategies = db.get_strategies()
-    print([s[0] for s in available_symbols])
-    available_symbols = [s[0] for s in available_symbols]
-    available_strategies = [s[0] for s in available_strategies]
     return render_template('auth/register.html', available_strategies = available_strategies, available_symbols = available_symbols)
 
 @bp.route('/login', methods=('GET', 'POST'))
@@ -46,13 +43,14 @@ def login():
         user = User(user)
         if user is None:
             error = 'Incorrect email.'
-        elif not user.valid_user_password(password):
+        elif not user.login(password):
             error = 'Incorrect password.'
         print(error)
         if error is None:
             print("Successful login!!")
             session.clear()
             session['user_id'] = user.id
+            g.user = user
             user_info = db.get_user_strategies(user)
             if user_info is not None:
                 return render_template('user_strategies.html', strategies = user_info)
@@ -67,18 +65,17 @@ def login():
 @bp.before_app_request
 def load_logged_in_user():
     user_id = session.get('user_id')
-
+    print(user_id)
     if user_id is None:
         g.user = None
     else:
-        g.user = DbConnection.getInstance().db.execute(
-            'SELECT * FROM USER WHERE id = ?', (user_id,)
-        ).fetchone()
+        g.user = User(DbConnection.getInstance().get_user_by_id(user_id))
+        print(g.user.username)
 
 @bp.route('/logout')
 def logout():
     session.clear()
-    return redirect(url_for('index'))
+    return redirect(url_for('home'))
 
 def login_required(view):
     @functools.wraps(view)

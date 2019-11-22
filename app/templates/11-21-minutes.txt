@@ -1,0 +1,39 @@
+Meeting with sponsors 11-21-2018
+
+more concerned with time series component than class labels
+how to treat "independent" inputs over time, in the best way with memory
+
+look into the amount of time-series data per dataset and see which has the most time-series info 
+
+possibly use different datasets and compare performance across them
+
+Possible Data Sets
+
+nuScenes
+- Very granular - Multiperspective (cameras and car POV)
+- 3d bounding boxes
+- lidar/radar/keyframes available
+labels include 
+-- vehicle.bus.bendy
+-- vehicle.bus.rigid
+-- vehicle.trailer
+-- vehicle.truck
+
+
+ApolloScape
+- 3D point cloud - could construct bounding box?
+- pretty granular, labels are chinese car models, also include class eg (sedan, car)
+- eye-level/car view
+
+YouTube-bb
+-Less granular, 2D bounding boxes
+-Subset of COCO labels
+-hand-held phone camera angle
+-preprocess to only include vehicle labels (bus, car, truck, motorcycle)
+
+City Cam
+-Frame by frame annotation with 2D bounding boxes
+-highly granular labels ()
+-Traffic surveillance footage - lots of objects within frame
+
+

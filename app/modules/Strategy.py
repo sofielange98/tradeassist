@@ -38,7 +38,7 @@ class Strategy:
 		y = json.loads(s)
 		signal = self.signal_check(y)
 		print(Signal(signal).name)
-		return(y)
+		return(Signal(signal).name)
 
 	def cross_over(self, prev, curr, stat, signal):
 		if float(prev[stat]) > float(prev[signal]) and float(curr[stat]) < float(curr[signal]):

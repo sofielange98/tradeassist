@@ -86,14 +86,15 @@ class DbConnection:
             user = {
                 'username': user['username'],
                 'email': user['email'],
-                'id':user['id']
+                'id':user['id'],
+                'password':user['password']
                 }
         return(user)
 
     def get_user_strategies(self,user):
         info = self.db.execute(
             ("SELECT "
-                "STRATEGIES.name, SYMBOL.symbol, USER_STRATEGIES.interim "
+                "USER_STRATEGIES.id, STRATEGIES.name, SYMBOL.symbol, USER_STRATEGIES.interim "
                 "from "
                 "USER_STRATEGIES "
                 "INNER JOIN STRATEGIES on STRATEGIES.id = USER_STRATEGIES.strat_id "
@@ -103,17 +104,23 @@ class DbConnection:
         return info
 
     def get_symbols(self):
-        return(self.db.execute(
+        available_symbols = self.db.execute(
         'SELECT symbol from SYMBOLS'
-        ).fetchall())
+        ).fetchall()
+        return([s[0] for s in available_symbols])
+
     def get_full_symbols(self):
-        return(self.db.execute(
+        available_symbols = self.db.execute(
         'SELECT symbol from SYMBOLS'
-        ).fetchall())
+        ).fetchall()
+        return([s[0] for s in available_symbols])
+
     def get_strategies(self):
-        return(self.db.execute(
+        available_strategies = self.db.execute(
         'SELECT name from STRATEGIES'
-        ).fetchall())
+        ).fetchall()
+        return([s[0] for s in available_strategies])
+
     def get_all_user_strategies(self):
         info = self.db.execute(
             ("SELECT " 
@@ -126,7 +133,38 @@ class DbConnection:
             ).fetchall()
         return info
 
+    def add_strategy(self, strat, user):
+        print(strat)
+        strat_id = self.db.execute(
+                'SELECT id FROM STRATEGIES where name =?',(strat['strategy'],)
+                ).fetchone()
+        print(strat_id)
+        symbol_id = self.db.execute(
+                'SELECT id FROM symbols where symbol = ?',(strat['symbol'],)
+                ).fetchone()
+        self.db.execute(
+                    'INSERT INTO USER_STRATEGIES (user_id, strat_id,symbol_id,interim) VALUES (?,?,?,?)',
+                    (user.id, strat_id[0],symbol_id[0],strat['frequency'])
+                )
+        self.db.commit()
 
+    def delete_user_strategy(self, strat_id):
+        self.db.execute(
+            'DELETE from USER_STRATEGIES where id =?',(strat_id,)
+            )
+        self.db.commit()
+
+    def update_user_strategy(self, sid, new_strat):
+        strat_id = self.db.execute(
+                'SELECT id FROM STRATEGIES where name =?',(new_strat['strategy'],)
+                ).fetchone()
+        symbol_id = self.db.execute(
+                'SELECT id FROM symbols where symbol = ?',(new_strat['symbol'],)
+                ).fetchone()
+        self.db.execute(
+            'UPDATE USER_STRATEGIES set strat_id=?, interim=?, symbol_id=? where id = ?',(strat_id[0], new_strat['frequency'],symbol_id[0], sid)
+            )
+        self.db.commit()
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(

@@ -20,8 +20,6 @@ def AllSymbols():
     db = DbConnection.getInstance()
 
     available_symbols = db.get_full_symbols()
-    available_symbols = [s[0] for s in available_symbols]
-    print(available_symbols)
     json_strings = {}
     json_other = {}
     for symbol in available_symbols:

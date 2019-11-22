@@ -1,27 +1,30 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <h1>My Strategies</h1>
 <div class = "container">
-	<div class = "row">
-	  	<div class = "col-md-3">
-	  		Technical Indicator
-	  	</div>
-	  	<div class = "col-md-3">
-	  		Symbol
-	  	</div>
-	  	<div class = "col-md-3">
-	  		Frequency
-	  	</div>
-  </div>
-  {% for user_strat in strategies %}
-  <div class = "row">
-  	{% for val in user_strat %}
-  	<div class = "col-md-3">
-  		{{val}}
-  	</div>
-  	{%endfor%}
-  </div>
-  {% endfor %}
+<fieldset class = "border p-2" style = "background-color:#1e212d;">
+  <legend style="font-weight:bold;  width:inherit; padding:0 10px; border-bottom:none;">My Strategies</legend>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Technical Indicator</th>
+          <th scope="col">Symbol</th>
+          <th scope="col">Frequency</th>
+          <th scope="col"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for idx in range(strategies|length) %}
+          <tr>
+            <td>{{idx+1}}</td>
+            {% for k in ['name','symbol','interim'] %}
+              <td>{{strategies[idx][k]}}</td>
+            {% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </fieldset>
 </div>
 {% endblock %}
