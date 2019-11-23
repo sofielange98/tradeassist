@@ -30,4 +30,27 @@ I haven't turned the strategies into factory pattern yet and still need to work 
 
 ## Screenshots!
 
+View Strategies
+Update Strategy Success
+(https://github.com/sofielange98/tradeassist/blob/master/resources/screenshots/ViewStrat.png)
+
+Add Strategy Success
+![Image of Yaktocat]
+(https://github.com/sofielange98/tradeassist/blob/master/resources/screenshots/Add.png)
+
+Update Strategy
+(https://github.com/sofielange98/tradeassist/blob/master/resources/screenshots/Update.png)
+
+Edit Pop-up
+(https://github.com/sofielange98/tradeassist/blob/master/resources/screenshots/EditPop.png)
+
+Update Strategy Success
+(https://github.com/sofielange98/tradeassist/blob/master/resources/screenshots/EditStrat.png)
+
+Emails Recieved
+(https://github.com/sofielange98/tradeassist/blob/master/resources/screenshots/Emails.png)
+
+
+
+
 
