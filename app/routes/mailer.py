@@ -6,7 +6,6 @@ from app.modules.db import DbConnection
 from app import app
 
 bp = Blueprint('mail', __name__, url_prefix='/mail')
-
 mail = Mail(app)
 
 @bp.route("/MailRequest/", methods = ["GET"])

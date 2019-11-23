@@ -3,7 +3,9 @@ from app.modules.Strategy import Strategy
 from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 from flask_mail import Mail, Message
-from app import app
+from flask import current_app, g
+from app import app 
+
 import requests
 import time
 # daily check will loop through all 
@@ -23,7 +25,6 @@ class DailyChecker:
 
 		need_checked = []
 		for user_strat in all_poss:
-
 			if user_strat['interim'] == 'daily':
 				need_checked.append(user_strat)
 			elif user_strat['interim'] == 'weekly':
@@ -62,8 +63,8 @@ class DailyChecker:
 			}
 			if notify != 0:
 				with app.app_context():
-					mail = Mail(app)
+					mail = Mail(current_app)
 					msg = Message('Time to Trade', sender = 'trade.assistant.flask@gmail.com', recipients = [strat['email']])
 					msg.body = self.create_email(params)
 					mail.send(msg)
-				return "Sent"
+					return "Sent"

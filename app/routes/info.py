@@ -7,13 +7,9 @@ bp = Blueprint('info', __name__, url_prefix='/info')
 
 @bp.route('/AllStrategies', methods=['GET'])
 def AllStrategies():
-    # db = DbConnection.getInstance()
-
-    # available_symbols = db.get_symbols()
-    # available_strategies = db.get_strategies()
-    # available_symbols = [s[0] for s in available_symbols]
-    # available_strategies = [s[0] for s in available_strategies]
-    return render_template('info/all_strategies.html')
+    db = DbConnection.getInstance()
+    available_symbols = db.get_full_symbols()
+    return render_template('info/all_strategies.html', available_symbols = available_symbols)
 
 @bp.route('/AllSymbols', methods=['GET'])
 def AllSymbols():
@@ -44,6 +40,4 @@ def AllSymbols():
             }
         json_strings[symbol] = json.dumps(symbol_info)
         json_other[symbol] = json.dumps(tech_info)
-    print(json_strings)
-    print(json_other)
     return render_template('info/all_symbols.html', available_symbols=available_symbols, symbol_info = json_strings, tech_info = json_other)

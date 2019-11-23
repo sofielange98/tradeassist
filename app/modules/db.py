@@ -3,7 +3,7 @@ import os
 import click
 from flask import current_app, g
 from flask.cli import with_appcontext
-from app import app
+from app import app 
 
 class DbConnection:
     __instance = None
@@ -17,13 +17,13 @@ class DbConnection:
             raise Exception("This class is a singleton!")
         else:
             DbConnection.__instance = self
+            print("Connecting to database")
             with app.app_context():
-                print("Connecting to database")
                 self.db = sqlite3.connect(
-                    current_app.config['DATABASE'],
-                    detect_types=sqlite3.PARSE_DECLTYPES,
-                    check_same_thread=False
-                )
+                        current_app.config['DATABASE'],
+                        detect_types=sqlite3.PARSE_DECLTYPES,
+                        check_same_thread=False
+                    )
                 self.db.row_factory = sqlite3.Row
 
     def __del__(self):

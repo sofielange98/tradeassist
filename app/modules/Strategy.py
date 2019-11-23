@@ -3,7 +3,7 @@ import requests
 import json
 from datetime import date 
 import enum 
-from app import app
+from app import app 
 
 class Signal(enum.Enum):
 	sell = -1
@@ -24,20 +24,22 @@ class Strategy:
 	def check_status(self, symbol):
 		triggered = False
 # https://www.alphavantage.co/query?function=MACD&symbol=MSFT&interval=daily&series_type=open&apikey=demo
-		params = {
-			'apikey' : app.config['ALPHA_API_KEY'],
-			'symbol' : symbol,
-			'function' : self.api_func,
-			'interval' : 'daily',
-			'series_type' : 'open'
-		}
+		with app.app_context():
+			params = {
+				'apikey' : app.config['ALPHA_API_KEY'],
+				'symbol' : symbol,
+				'function' : self.api_func,
+				'interval' : 'daily',
+				'series_type' : 'open'
+			}
 		if self.api_func == 'BBANDS':
 			params['time_period'] = 60
 		resp = requests.get(url = self.api_url, params = params)
 		s = json.dumps(resp.json())
 		y = json.loads(s)
 		signal = self.signal_check(y)
-		print(Signal(signal).name)
+		if signal not in [0,1,-1]:
+			signal = 0
 		return(Signal(signal).name)
 
 	def cross_over(self, prev, curr, stat, signal):
