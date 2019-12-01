@@ -7,11 +7,13 @@ from app import app
 
 class DbConnection:
     __instance = None
+
     @staticmethod 
     def getInstance():
         if DbConnection.__instance == None:
             DbConnection()
         return DbConnection.__instance
+
     def __init__(self):
         if DbConnection.__instance != None:
             raise Exception("This class is a singleton!")
@@ -27,34 +29,47 @@ class DbConnection:
                 self.db.row_factory = sqlite3.Row
 
     def __del__(self):
+        DbConnection.__instance = None
         print("Closing database connection")
-        self.db.close()
+        if hasattr(self, 'db'):
+            self.db.close()
 
     def insert_new_user(self, user):
-        self.db.execute(
-                'INSERT INTO USER (email, username, password) VALUES (?, ?, ?)',
-                (user.email, user.username, user.password)
-            )
-        self.db.commit()
-        user_id = self.db.execute(
+        if self.check_existing_user(user):
+            user_id = self.db.execute(
             'SELECT id FROM user WHERE email = ?', (user.email,)
             ).fetchone()
-        print(user_id[0])
-        for i in range(len(user.indicators)):
-            print([user.indicators[i]])
-            strat_id = self.db.execute(
-                'SELECT id FROM STRATEGIES where name =?',([user.indicators[i]])
-                ).fetchone()
-            print(strat_id)
-            symbol_id = self.db.execute(
-                'SELECT id FROM symbols where symbol = ?',([user.symbols[i]])
-                ).fetchone()
+        else:
             self.db.execute(
-                    'INSERT INTO USER_STRATEGIES (user_id, strat_id,symbol_id,interim) VALUES (?,?,?,?)',
-                    (user_id[0], strat_id[0],symbol_id[0],user.frequencies[i])
+                    'INSERT INTO USER (email, username, password) VALUES (?, ?, ?)',
+                    (user.email, user.username, user.password)
                 )
-        self.db.commit()
+            self.db.commit()
+            user_id = self.db.execute(
+                'SELECT id FROM user WHERE email = ?', (user.email,)
+                ).fetchone()
+            if hasattr(user, 'indicators'):
+                for i in range(len(user.indicators)):
+                    print([user.indicators[i]])
+                    strat_id = self.db.execute(
+                        'SELECT id FROM STRATEGIES where name =?',([user.indicators[i]])
+                        ).fetchone()
+                    print(strat_id)
+                    symbol_id = self.db.execute(
+                        'SELECT id FROM symbols where symbol = ?',([user.symbols[i]])
+                        ).fetchone()
+                    self.db.execute(
+                            'INSERT INTO USER_STRATEGIES (user_id, strat_id,symbol_id,interim) VALUES (?,?,?,?)',
+                            (user_id[0], strat_id[0],symbol_id[0],user.frequencies[i])
+                        )
+                self.db.commit()
         return user_id[0]
+    def delete_user(self,user):
+        self.db.execute(
+                'DELETE FROM USER where username = ? and email = ? and password = ?',
+                (user.username,user.email,user.password)
+            )
+        self.db.commit()
 
     def check_existing_user(self, user):
         if self.db.execute(
