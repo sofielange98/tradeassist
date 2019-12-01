@@ -35,7 +35,6 @@ class Config(object):
 # def job1(a,b):
 #     print(a,b)
 
-
 app = Flask(__name__)
 
     #scheduler set up
@@ -59,8 +58,8 @@ from flask_mail import Mail, Message
 mail = Mail(app)
 
 with app.app_context():
-    from app.modules.db import DbConnection
-    DbConnection()
+    # from app.modules.db import DbConnection
+    # DbConnection().
 
     scheduler = APScheduler()
     scheduler.init_app(app)
@@ -81,6 +80,5 @@ app.register_blueprint(info.bp)
 from app.routes import account
 app.register_blueprint(account.bp)
     
-
 
 
