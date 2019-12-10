@@ -3,6 +3,9 @@ import os
 from flask import Flask
 from flask_apscheduler import APScheduler
 
+import requests
+import json
+
 class Config(object):
     JOBS = [
         {
@@ -13,11 +16,10 @@ class Config(object):
             
         }
         # {
-        #     'id': 'job1',
-        #     'func': 'app:job1',
-        #     'args': (1, 2),
+        #     'id': 'demo_check',
+        #     'func': 'app:demo_check',
         #     'trigger': 'interval',
-        #     'seconds': 20,
+        #     'seconds': 10,
             
         # }
     ]
@@ -32,8 +34,8 @@ class Config(object):
     MAIL_USE_TLS = False
     MAIL_USE_SSL = True
 
-# def job1(a,b):
-#     print(a,b)
+    # I'm gonna have the app get forex exchange rates every 5 seconds and give them to me
+
 
 app = Flask(__name__)
 
@@ -57,6 +59,42 @@ def check():
 from flask_mail import Mail, Message
 mail = Mail(app)
 
+def demo_check():
+
+# https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=demo
+
+    params = {
+            'apikey' : 'EKO46GFZF2SFKBM7',
+            'from_currency' : 'USD',
+            'to_currency':'JPY',
+            'function' : 'CURRENCY_EXCHANGE_RATE'
+    }
+
+    resp = requests.get(url = 'https://www.alphavantage.co/query?', params = params)
+    print(resp.status_code)
+    if resp.status_code == 200: # OK
+        s = json.dumps(resp.json())
+        y = json.loads(s)
+        if 'Note' in y:
+            return 'none'
+        print(y)
+        bid = y["Realtime Currency Exchange Rate"]['8. Bid Price']
+        ask = y["Realtime Currency Exchange Rate"]['9. Ask Price']
+        
+        message = '''
+        Current Bid Price for USD/EUR Exchange Rate: {}
+
+        Current Ask Price for USD/EUR Exchange Rate: {}
+
+        Happy Trading!
+        '''.format(bid, ask)
+
+        with app.app_context():
+
+            msg = Message('Exchange Rates', sender = 'trade.assistant.flask@gmail.com', recipients = ['sofie.lange.98@gmail.com'])
+            msg.body = message
+
+            mail.send(msg)
 with app.app_context():
     # from app.modules.db import DbConnection
     # DbConnection().
@@ -67,6 +105,10 @@ with app.app_context():
 
     from app.routes import mailer
     app.register_blueprint(mailer.bp)
+
+from app.modules.Strategy import Strategy
+s = Strategy("STOCHASTIC")
+s.check_status('SPY')
 
 from app.routes import auth
 app.register_blueprint(auth.bp)
@@ -80,5 +122,4 @@ app.register_blueprint(info.bp)
 from app.routes import account
 app.register_blueprint(account.bp)
     
-
 
