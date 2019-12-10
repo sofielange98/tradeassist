@@ -1,6 +1,10 @@
 to run locally, first clone the repository
-requires python 3
+
+**** requires python 3 *****
+
 run the following once the repo is on your machine
+
+
 cd tradeassist
 # activate the virtual environment
 source app/env/bin/activate
