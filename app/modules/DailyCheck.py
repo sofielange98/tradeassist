@@ -40,7 +40,7 @@ class DailyChecker:
 			print("Num checks needed ", len(need_checked))
 			self.check_me = need_checked
 		else:
-			print('Weekend! No trading today!')
+			print('Its the Weekend! No trading today!')
 			self.strategies = []
 			self.check_me = []
 
@@ -56,8 +56,8 @@ class DailyChecker:
 	def execute(self):
 		strat_map = {}
 		for strategy in self.strategies:
-			strat_map[strategy] = Strategy(strategy)
-			print(strat_map[strategy].name)
+			strat_map[strategy] = Strategy.factory(strategy)
+			print(type(strat_map[strategy]).__name__)
 		if len(self.check_me) != 0:
 			mailer = Mailer()
 		for strat in self.check_me:

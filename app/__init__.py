@@ -2,9 +2,12 @@ import os
 
 from flask import Flask
 from flask_apscheduler import APScheduler
+from datetime import datetime
 
 import requests
 import json
+
+from app.rand_curr import get_random_currency
 
 class Config(object):
     JOBS = [
@@ -13,15 +16,15 @@ class Config(object):
             'func': 'app:check',
             'trigger': 'interval',
             'days': 1,
+            'start_date':datetime.today().replace(hour=22)
+        },
+        {
+            'id': 'demo_check',
+            'func': 'app:demo_check',
+            'trigger': 'interval',
+            'seconds': 20,
             
         }
-        # {
-        #     'id': 'demo_check',
-        #     'func': 'app:demo_check',
-        #     'trigger': 'interval',
-        #     'seconds': 10,
-            
-        # }
     ]
 
     SCHEDULER_API_ENABLED = True
@@ -59,14 +62,12 @@ def check():
 from flask_mail import Mail, Message
 mail = Mail(app)
 
-def demo_check():
-
-# https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=demo
-
+def get_exchange():
+    phys_currency, dig_currency = get_random_currency()
     params = {
             'apikey' : 'EKO46GFZF2SFKBM7',
-            'from_currency' : 'USD',
-            'to_currency':'JPY',
+            'from_currency' : phys_currency,
+            'to_currency': dig_currency,
             'function' : 'CURRENCY_EXCHANGE_RATE'
     }
 
@@ -77,24 +78,42 @@ def demo_check():
         y = json.loads(s)
         if 'Note' in y:
             return 'none'
-        print(y)
-        bid = y["Realtime Currency Exchange Rate"]['8. Bid Price']
-        ask = y["Realtime Currency Exchange Rate"]['9. Ask Price']
-        
-        message = '''
-        Current Bid Price for USD/EUR Exchange Rate: {}
+    return y
+def demo_check():
 
-        Current Ask Price for USD/EUR Exchange Rate: {}
+# https://www.alphavantage.co/query?function=CURRENCY_EXCHANGE_RATE&from_currency=USD&to_currency=JPY&apikey=demo
+    y = get_exchange()
+    print(y)
+    while y["Realtime Currency Exchange Rate"]['8. Bid Price'] == '-':
+        y = get_exchange()
+    print(y)
+    if y == 'none': 
+        return
+
+    from_name = y["Realtime Currency Exchange Rate"]['2. From_Currency Name']
+    to_name = y["Realtime Currency Exchange Rate"]['4. To_Currency Name']
+    phys_currency = y["Realtime Currency Exchange Rate"]['1. From_Currency Code']
+    dig_currency = y["Realtime Currency Exchange Rate"]['3. To_Currency Code']
+    bid = y["Realtime Currency Exchange Rate"]['8. Bid Price']
+    ask = y["Realtime Currency Exchange Rate"]['9. Ask Price']
+        
+    message = '''
+        From Currency: {}
+        To Currency: {}
+        Current Bid Price for {}/{} Exchange Rate: {}
+
+        Current Ask Price for {}/{} Exchange Rate: {}
 
         Happy Trading!
-        '''.format(bid, ask)
+        '''.format(from_name, to_name,phys_currency, dig_currency, bid, phys_currency, dig_currency, ask)
 
-        with app.app_context():
+    with app.app_context():
 
-            msg = Message('Exchange Rates', sender = 'trade.assistant.flask@gmail.com', recipients = ['sofie.lange.98@gmail.com'])
-            msg.body = message
+        msg = Message('Exchange Rates', sender = 'trade.assistant.flask@gmail.com', recipients = ['sofie.lange.98@gmail.com'])
+        msg.body = message
 
-            mail.send(msg)
+        mail.send(msg)
+
 with app.app_context():
     # from app.modules.db import DbConnection
     # DbConnection().
@@ -107,8 +126,6 @@ with app.app_context():
     app.register_blueprint(mailer.bp)
 
 from app.modules.Strategy import Strategy
-s = Strategy("STOCHASTIC")
-s.check_status('SPY')
 
 from app.routes import auth
 app.register_blueprint(auth.bp)
@@ -122,4 +139,3 @@ app.register_blueprint(info.bp)
 from app.routes import account
 app.register_blueprint(account.bp)
     
-

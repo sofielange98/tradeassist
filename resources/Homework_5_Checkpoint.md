@@ -1,7 +1,5 @@
 # Homework 5 Checkpoint
 
-Hi! I'm your first Markdown file in **StackEdit**. If you want to learn about StackEdit, you can read me. If you want to play with Markdown, you can edit me. Once you have finished with me, you can create new files by opening the **file explorer** on the left corner of the navigation bar.
-
 ## Original Homework Plan
 
 > "The app will be able to execute all functionality at this point and will also have a user-friendly interface which makes sense and looks polished for signing up for the service and checking status of strategy"
