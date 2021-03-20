@@ -8,7 +8,7 @@ Flask-APScheduler==1.11.0
 Flask-Mail==0.9.1
 idna==2.8
 itsdangerous==1.1.0
-Jinja2==2.10.3
+Jinja2==2.11.3
 Keras-Applications==1.0.8
 Keras-Preprocessing==1.1.0
 MarkupSafe==1.1.1
